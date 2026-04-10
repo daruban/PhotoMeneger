@@ -35,17 +35,6 @@ class S3Client:
             response = await client.get_object(Bucket=self.bucket_name, Key=object_name)
             yield response
 
-    async def upload_object(
-            self,
-            file: UploadFile,
-    ):
-        async with self.get_client() as client:
-            await client.put_object(
-                Bucket=self.bucket_name,
-                Key=file.filename,
-                Body=file.file
-            )
-
     async def get_all_objects(
             self,
     ):
@@ -66,24 +55,30 @@ class S3Client:
             )
             return await result['Body'].read()
 
+    async def upload_object(
+            self,
+            file: UploadFile,
+    ):
+        async with self.get_client() as client:
+            await client.put_object(
+                Bucket=self.bucket_name,
+                Key=file.filename,
+                Body=file.file
+            )
 
-s3_client = S3Client(
+    async def delete_object(
+            self,
+            object_name: str,
+    ):
+        async with self.get_client() as client:
+            await client.delete_object(
+                Bucket=self.bucket_name,
+                Key=object_name
+            )
+
+s3_photo = S3Client(
     access_key=os.environ["AWS_ACCESS_KEY_ID"],
     secret_key=os.environ["AWS_SECRET_ACCESS_KEY"],
     endpoint_url=os.environ["AWS_ENDPOINT_URL"],
     bucket_name="test-bucket",
 )
-
-
-async def main():
-    s3_client = S3Client(
-        access_key=os.environ["AWS_ACCESS_KEY_ID"],
-        secret_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        endpoint_url=os.environ["AWS_ENDPOINT_URL"],
-        bucket_name="test-bucket",
-    )
-
-    await s3_client.get_object('gimly.jpg')
-
-if __name__ == '__main__':
-    asyncio.run(main())

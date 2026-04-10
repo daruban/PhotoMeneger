@@ -3,8 +3,9 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, APIRouter
 from pydantic import BaseModel, FilePath
 from fastapi.responses import FileResponse, StreamingResponse, Response
 from pathlib import Path
-from database.s3 import s3_client
+from database.s3 import s3_photo
 from contextlib import AsyncExitStack
+
 
 photo_router = APIRouter()
 
@@ -17,7 +18,7 @@ async def home():
     summary="Получение всех фото"
 )
 async def fetch_photos():
-    result = await s3_client.get_all_objects()
+    result = await s3_photo.get_all_objects()
     return result
 
 @photo_router.get(
@@ -28,7 +29,7 @@ async def get_photo(photo_id: str):
     exit_stack = AsyncExitStack()
 
     response = await exit_stack.enter_async_context(
-        s3_client.get_streaming_object(photo_id)
+        s3_photo.get_streaming_object(photo_id)
     )
 
     return StreamingResponse(
@@ -39,9 +40,16 @@ async def get_photo(photo_id: str):
 
 @photo_router.post(
     "/upload",
-    summary="Добавлине фото"
+    summary="Добавление фото"
 )
-async def upload(file: UploadFile = File(...)):
-    print(type(file))
-    await s3_client.upload_object(file)
+async def upload_photo(file: UploadFile = File(...)):
+    await s3_photo.upload_object(file)
+    return {"message": "Success"}
+
+@photo_router.post(
+    "/delete{photo_id}",
+    summary="Удаление фото"
+)
+async def delete_photo(photo_id: str):
+    await s3_photo.delete_object(photo_id)
     return {"message": "Success"}
