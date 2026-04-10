@@ -46,7 +46,7 @@ async def upload_photo(file: UploadFile = File(...)):
     await s3_photo.upload_object(file)
     return {"message": "Success"}
 
-@photo_router.post(
+@photo_router.delete(
     "/delete{photo_id}",
     summary="Удаление фото"
 )
