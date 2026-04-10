@@ -1,9 +1,6 @@
-import uvicorn
-from fastapi import FastAPI, HTTPException, UploadFile, File, APIRouter
-from pydantic import BaseModel, FilePath
-from fastapi.responses import FileResponse, StreamingResponse, Response
-from pathlib import Path
-from database.s3 import s3_photo
+from fastapi import UploadFile, File, APIRouter
+from fastapi.responses import StreamingResponse
+from src.database.s3 import s3_photo
 from contextlib import AsyncExitStack
 
 

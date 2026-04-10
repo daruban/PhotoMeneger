@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
-from photo.view import  photo_router
+from src.photo.view import  photo_router
 
 
 class ErrorMessage(BaseModel):
