@@ -44,7 +44,7 @@ async def upload_photo(file: UploadFile = File(...)):
     return {"message": "Success"}
 
 @photo_router.delete(
-    "/delete{photo_id}",
+    "/delete/{photo_id}",
     summary="Удаление фото"
 )
 async def delete_photo(photo_id: str):
