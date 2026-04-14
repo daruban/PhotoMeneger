@@ -7,8 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-run:
-    runs-on: [self-hosted, docker]
+  build:
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
