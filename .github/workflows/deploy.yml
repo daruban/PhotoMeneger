@@ -1,0 +1,24 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-run:
+    runs-on: [self-hosted, docker]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build -t photo_meneger:latest .
+
+    - name: Push to local registry
+      run: |
+        docker tag photo_meneger:latest $HUB_URL/photo_meneger:latest
+        docker push $HUB_URL/photo_meneger:latest
