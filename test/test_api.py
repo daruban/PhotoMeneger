@@ -30,16 +30,29 @@ MOCK_PHOTOS = [
 ]
 
 
+mock_s3_client = AsyncMock()
+mock_s3_client.get_all_objects.return_value = MOCK_PHOTOS
+
+async def override_get_s3_client():
+    return mock_s3_client
+
+
 @pytest.mark.asyncio
 async def test_get_all_objects():
-    with patch('src.database.s3.s3_photo.get_all_objects', new_callable=AsyncMock) as mock_get_all:
-        mock_get_all.return_value = MOCK_PHOTOS
+    from src.database.s3 import get_s3_client
 
+    app.dependency_overrides[get_s3_client] = override_get_s3_client
+
+    try:
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/photo/photos")
 
+        # 2. Проверки
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
         assert data[0]["Key"] == "test_photo1.jpg"
-        mock_get_all.assert_awaited_once()
+        mock_s3_client.get_all_objects.assert_awaited_once()
+
+    finally:
+        app.dependency_overrides.clear()

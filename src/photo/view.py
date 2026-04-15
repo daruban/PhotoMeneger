@@ -1,6 +1,7 @@
-from fastapi import UploadFile, File, APIRouter
+from fastapi import UploadFile, File, APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from src.database.s3 import s3_photo
+
+from src.database.s3 import S3Client, get_s3_client
 from contextlib import AsyncExitStack
 
 
@@ -14,8 +15,11 @@ async def home():
     "/photos",
     summary="Получение всех фото"
 )
-async def fetch_photos():
-    result = await s3_photo.get_all_objects()
+async def fetch_photos(
+        s3: S3Client = Depends(get_s3_client)
+):
+    result = await s3.get_all_objects()
+    print(result)
     return result
 
 @photo_router.get(
@@ -39,14 +43,20 @@ async def get_photo(photo_id: str):
     "/upload",
     summary="Добавление фото"
 )
-async def upload_photo(file: UploadFile = File(...)):
-    await s3_photo.upload_object(file)
+async def upload_photo(
+        file: UploadFile = File(...),
+        s3: S3Client = Depends(get_s3_client)
+):
+    await s3.upload_object(file)
     return {"message": "Success"}
 
 @photo_router.delete(
     "/delete/{photo_id}",
     summary="Удаление фото"
 )
-async def delete_photo(photo_id: str):
-    await s3_photo.delete_object(photo_id)
+async def delete_photo(
+        photo_id: str,
+        s3: S3Client = Depends(get_s3_client)
+):
+    await s3.delete_object(photo_id)
     return {"message": "Success"}

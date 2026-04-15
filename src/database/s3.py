@@ -76,9 +76,14 @@ class S3Client:
                 Key=object_name
             )
 
-s3_photo = S3Client(
-    access_key=os.environ["AWS_ACCESS_KEY_ID"],
-    secret_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-    endpoint_url=os.environ["AWS_ENDPOINT_URL"],
-    bucket_name="test-bucket",
-)
+
+
+
+def get_s3_client():
+    s3_photo = S3Client(
+        access_key=os.environ["AWS_ACCESS_KEY_ID"],
+        secret_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        endpoint_url=os.environ["AWS_ENDPOINT_URL"],
+        bucket_name="test-bucket",
+    )
+    return s3_photo
